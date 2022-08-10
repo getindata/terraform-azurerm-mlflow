@@ -1,6 +1,4 @@
-# Example output from the module
-
-output "example_output" {
-  description = "Example output of the module"
-  value       = var.example_var
+output "storage_connection_string" {
+  value = data.azurerm_storage_account.storage_account.primary_connection_string
+  sensitive = true
 }

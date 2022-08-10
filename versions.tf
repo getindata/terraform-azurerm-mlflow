@@ -8,5 +8,20 @@ terraform {
       source  = "hashicorp/null"
       version = "3.1.1"
     }
+
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">=3.17.0"
+    }
+
+    random = {
+      source  = "hashicorp/random"
+      version = ">=3.3.2"
+    }
+
+    azapi = {
+      source  = "Azure/azapi"
+      version = "0.4.0"
+    }
   }
 }
