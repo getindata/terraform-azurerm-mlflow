@@ -1,4 +1,8 @@
-output "example_output" {
-  description = "Example output of the module"
-  value       = module.terraform_module_template
+output "storage_connection_string" {
+  value = module.azure_mlfow.storage_connection_string
+  sensitive = true
+}
+
+output "mlflow_tracking_uri" {
+  value = module.azure_mlfow.mlflow_tracking_uri
 }

@@ -65,3 +65,15 @@ variable "max_replicas" {
   type        = number
   default     = 1
 }
+
+variable "auth" {
+  type = object({
+    type          = string
+    client_id     = string
+    client_secret = string
+    azureActiveDirectory = optional(object({
+      tenant_id = string
+    }))
+  })
+  sensitive = true
+}

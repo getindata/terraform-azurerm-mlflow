@@ -8,3 +8,9 @@ data "azurerm_resource_group" "rg" {
 resource "random_id" "unique_suffix" {
   byte_length = 4
 }
+
+terraform {
+  # Optional attributes and the defaults function are
+  # both experimental, so we must opt in to the experiment.
+  experiments = [module_variable_optional_attrs]
+}

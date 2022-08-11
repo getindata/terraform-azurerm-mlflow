@@ -42,9 +42,10 @@ resource "azapi_resource" "mlflow_app" {
   location  = local.location
   parent_id = data.azurerm_resource_group.rg.id
   type      = "Microsoft.App/containerApps@2022-03-01"
+  response_export_values = ["*"]
 
   body = jsonencode({
-    properties : {
+    properties = {
       managedEnvironmentId = azapi_resource.managed_environment.id
       configuration = {
         ingress = {
@@ -61,6 +62,10 @@ resource "azapi_resource" "mlflow_app" {
           {
             name  = "storage-connection-string"
             value = data.azurerm_storage_account.storage_account.primary_connection_string
+          },
+          {
+            name  = local.auth_client_secret
+            value = var.auth.client_secret
           }
         ]
       }
@@ -105,4 +110,50 @@ resource "azapi_resource" "mlflow_app" {
     azapi_resource.managed_environment,
     azurerm_mssql_database.mlflow_db
   ]
+}
+
+
+locals {
+  auth_client_secret = "auth-client-secret"
+  identityProviders = {
+    google = {
+      enabled = true
+      registration = {
+        clientId                = var.auth.client_id
+        clientSecretSettingName = local.auth_client_secret
+      }
+      validation = {
+        allowedAudiences = ["32555940559.apps.googleusercontent.com"]
+      }
+    }
+
+    azureActiveDirectory = {
+      enabled = true
+      registration = {
+        clientId                = var.auth.client_id
+        clientSecretSettingName = local.auth_client_secret
+        openIdIssuer            = "https://sts.windows.net/${var.auth.azureActiveDirectory != null ? var.auth.azureActiveDirectory.tenant_id : ""}/v2.0"
+      }
+    }
+  }
+}
+
+resource "azapi_resource" "mlflow_app_auth" {
+  name      = "current"
+  parent_id = azapi_resource.mlflow_app.id
+  type      = "Microsoft.App/containerApps/authConfigs@2022-03-01"
+
+  body = jsonencode({
+    properties = {
+      platform = {
+        enabled = true
+      }
+      globalValidation = {
+        unauthenticatedClientAction = "RedirectToLoginPage"
+      }
+      identityProviders = {
+        (var.auth.type) = lookup(local.identityProviders, var.auth.type, null)
+      }
+    }
+  })
 }
