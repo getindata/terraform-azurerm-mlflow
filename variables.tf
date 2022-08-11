@@ -67,6 +67,7 @@ variable "max_replicas" {
 }
 
 variable "auth" {
+  description = "OAuth2.0 provider configuration for MLflow app instance. Supported types: azureActiveDirectory, google"
   type = object({
     type          = string
     client_id     = string

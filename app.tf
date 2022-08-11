@@ -38,10 +38,10 @@ data "azurerm_storage_account" "storage_account" {
 }
 
 resource "azapi_resource" "mlflow_app" {
-  name      = "mlflow-app-${random_id.unique_suffix.hex}"
-  location  = local.location
-  parent_id = data.azurerm_resource_group.rg.id
-  type      = "Microsoft.App/containerApps@2022-03-01"
+  name                   = "mlflow-app-${random_id.unique_suffix.hex}"
+  location               = local.location
+  parent_id              = data.azurerm_resource_group.rg.id
+  type                   = "Microsoft.App/containerApps@2022-03-01"
   response_export_values = ["*"]
 
   body = jsonencode({
@@ -74,7 +74,8 @@ resource "azapi_resource" "mlflow_app" {
           image = var.mlflow_docker_image
           name  = "mlflow-app"
           env = [{
-            name      = "BACKEND_STORE_URI"
+            name = "BACKEND_STORE_URI"
+            #checkov:skip=CKV_SECRET_6:This is only a secret name
             secretRef = "sql-connection-string"
             },
             {
@@ -82,7 +83,8 @@ resource "azapi_resource" "mlflow_app" {
               value = "wasbs://${local.storage_container_name}@${module.storage_account.storage_account_name}.blob.core.windows.net/artifacts"
             },
             {
-              name      = "AZURE_STORAGE_CONNECTION_STRING"
+              name = "AZURE_STORAGE_CONNECTION_STRING"
+              #checkov:skip=CKV_SECRET_6:This is only a secret name
               secretRef = "storage-connection-string"
             }
           ]
@@ -112,32 +114,6 @@ resource "azapi_resource" "mlflow_app" {
   ]
 }
 
-
-locals {
-  auth_client_secret = "auth-client-secret"
-  identityProviders = {
-    google = {
-      enabled = true
-      registration = {
-        clientId                = var.auth.client_id
-        clientSecretSettingName = local.auth_client_secret
-      }
-      validation = {
-        allowedAudiences = ["32555940559.apps.googleusercontent.com"]
-      }
-    }
-
-    azureActiveDirectory = {
-      enabled = true
-      registration = {
-        clientId                = var.auth.client_id
-        clientSecretSettingName = local.auth_client_secret
-        openIdIssuer            = "https://sts.windows.net/${var.auth.azureActiveDirectory != null ? var.auth.azureActiveDirectory.tenant_id : ""}/v2.0"
-      }
-    }
-  }
-}
-
 resource "azapi_resource" "mlflow_app_auth" {
   name      = "current"
   parent_id = azapi_resource.mlflow_app.id
@@ -152,7 +128,7 @@ resource "azapi_resource" "mlflow_app_auth" {
         unauthenticatedClientAction = "RedirectToLoginPage"
       }
       identityProviders = {
-        (var.auth.type) = lookup(local.identityProviders, var.auth.type, null)
+        (var.auth.type) = lookup(local.identity_providers, var.auth.type, null)
       }
     }
   })

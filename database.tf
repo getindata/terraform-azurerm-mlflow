@@ -4,13 +4,19 @@ resource "random_password" "db_password" {
   min_numeric = 3
 }
 
+
 resource "azurerm_mssql_server" "mlflow_db_server" {
-  name                         = "mlflow-sqlserver-${random_id.unique_suffix.hex}"
-  resource_group_name          = data.azurerm_resource_group.rg.name
-  location                     = local.location
-  version                      = "12.0"
-  administrator_login          = var.db_admin_username
-  administrator_login_password = random_password.db_password.result
+  #checkov:skip=CKV_AZURE_23:Auditing not required
+  #checkov:skip=CKV_AZURE_24:Auditing not required
+
+  name                          = "mlflow-sqlserver-${random_id.unique_suffix.hex}"
+  resource_group_name           = data.azurerm_resource_group.rg.name
+  location                      = local.location
+  version                       = "12.0"
+  administrator_login           = var.db_admin_username
+  administrator_login_password  = random_password.db_password.result
+  minimum_tls_version           = "1.2"
+  public_network_access_enabled = false
 }
 
 resource "azurerm_mssql_firewall_rule" "mlflow_db_firewall_allow_internal" {

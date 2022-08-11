@@ -15,9 +15,9 @@ module "azure_mlfow" {
   #  }
 
   auth = {
-    type = "azureActiveDirectory"
+    type          = "azureActiveDirectory"
     client_secret = ""
-    client_id = ""
+    client_id     = ""
     azureActiveDirectory = {
       tenant_id = ""
     }
