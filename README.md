@@ -122,6 +122,7 @@ https://login.microsoftonline.com/<tenant id>/oauth2/v2.0/token \
 -d 'client_secret=<client secret>' | jq -r .access_token) 
 ```
 Note that `scope` has both `<client id>` and a suffix `%2f.default` which is a url encoded `./default`.
+
 3. Use the token
 ```bash
 curl -L https://<mlflow url on .azurecontainerapps.io>/api/2.0/mlflow/experiments/list -H "Authorization: Bearer $T"
