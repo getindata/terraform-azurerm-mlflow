@@ -5,6 +5,7 @@ resource "azurerm_log_analytics_workspace" "log_workspace" {
   sku                 = "PerGB2018"
   retention_in_days   = 30
   count               = var.log_analytics_workspace_id == null ? 1 : 0
+  tags                = module.this.context.tags
 }
 
 data "azurerm_log_analytics_workspace" "log_workspace" {
@@ -47,6 +48,8 @@ resource "azapi_resource" "managed_environment" {
       tags
     ]
   }
+
+  tags = module.this.context.tags
 }
 
 data "azurerm_storage_account" "storage_account" {

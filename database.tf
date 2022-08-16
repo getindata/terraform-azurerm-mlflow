@@ -18,6 +18,7 @@ resource "azurerm_mssql_server" "mlflow_db_server" {
   administrator_login_password  = random_password.db_password.result
   minimum_tls_version           = "1.2"
   public_network_access_enabled = true
+  tags                          = module.this.context.tags
 }
 
 resource "azurerm_mssql_firewall_rule" "mlflow_db_firewall_allow_internal" {
@@ -43,4 +44,5 @@ resource "azurerm_mssql_database" "mlflow_db" {
       tags
     ]
   }
+  tags = module.this.context.tags
 }

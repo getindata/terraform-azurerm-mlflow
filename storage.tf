@@ -15,4 +15,5 @@ module "storage_account" {
     }
   ]
 
+  tags = module.this.context.tags
 }
