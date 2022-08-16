@@ -6,7 +6,7 @@ module "azure_mlfow" {
   source  = "../.."
   context = module.this.context
 
-  resource_group = data.azurerm_resource_group.this.name
+  resource_group_name = data.azurerm_resource_group.this.name
 
   #  auth = {
   #    type = "google"

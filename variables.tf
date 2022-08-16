@@ -1,7 +1,7 @@
 # Example, compulsory input variable
 
 
-variable "resource_group" {
+variable "resource_group_name" {
   description = "Resource Group name"
   type        = string
 }
@@ -77,4 +77,10 @@ variable "auth" {
     }))
   })
   sensitive = true
+}
+
+variable "log_analytics_workspace_id" {
+  description = "Existing log analytics workspace id (or leave `null` to create one)"
+  type        = string
+  default     = null
 }

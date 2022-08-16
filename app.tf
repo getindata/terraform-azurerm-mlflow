@@ -1,13 +1,31 @@
 resource "azurerm_log_analytics_workspace" "log_workspace" {
-  name                = "mflow-log-analytics-${random_id.unique_suffix.hex}"
+  name                = local.log_analytics_name_from_descriptor
   location            = local.location
   resource_group_name = data.azurerm_resource_group.rg.name
   sku                 = "PerGB2018"
   retention_in_days   = 30
+  count               = var.log_analytics_workspace_id == null ? 1 : 0
+}
+
+data "azurerm_log_analytics_workspace" "log_workspace" {
+  resource_group_name = data.azurerm_resource_group.rg.name
+  name                = var.log_analytics_workspace_id
+
+  count = var.log_analytics_workspace_id != null ? 1 : 0
+}
+
+locals {
+  log_workspace = var.log_analytics_workspace_id == null ? {
+    workspace_id       = one(azurerm_log_analytics_workspace.log_workspace[*]).workspace_id
+    primary_shared_key = one(azurerm_log_analytics_workspace.log_workspace[*]).primary_shared_key
+    } : {
+    workspace_id       = one(data.azurerm_log_analytics_workspace.log_workspace[*]).workspace_id
+    primary_shared_key = one(data.azurerm_log_analytics_workspace.log_workspace[*]).primary_shared_key
+  }
 }
 
 resource "azapi_resource" "managed_environment" {
-  name      = "mlflow-managed-env-${random_id.unique_suffix.hex}"
+  name      = local.mlflow_name_from_descriptor
   location  = local.location
   parent_id = data.azurerm_resource_group.rg.id
   type      = "Microsoft.App/managedEnvironments@2022-03-01"
@@ -17,8 +35,8 @@ resource "azapi_resource" "managed_environment" {
       appLogsConfiguration = {
         destination = "log-analytics"
         logAnalyticsConfiguration = {
-          customerId = azurerm_log_analytics_workspace.log_workspace.workspace_id
-          sharedKey  = azurerm_log_analytics_workspace.log_workspace.primary_shared_key
+          customerId = local.log_workspace.workspace_id
+          sharedKey  = local.log_workspace.primary_shared_key
         }
       }
     }
@@ -38,7 +56,7 @@ data "azurerm_storage_account" "storage_account" {
 }
 
 resource "azapi_resource" "mlflow_app" {
-  name                   = "mlflow-app-${random_id.unique_suffix.hex}"
+  name                   = local.mlflow_name_from_descriptor
   location               = local.location
   parent_id              = data.azurerm_resource_group.rg.id
   type                   = "Microsoft.App/containerApps@2022-03-01"

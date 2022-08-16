@@ -1,6 +1,9 @@
 locals {
-  location               = var.location == null ? data.azurerm_resource_group.rg.location : var.location
-  storage_container_name = "mlflow-artifacts"
+  mlflow_name_from_descriptor        = replace(lookup(module.this.descriptors, "mlflow", module.this.id), "/--+/", "-")
+  database_name_from_descriptor      = replace(lookup(module.this.descriptors, "database", module.this.id), "/--+/", "-")
+  log_analytics_name_from_descriptor = replace(lookup(module.this.descriptors, "log-analytics", module.this.id), "/--+/", "-")
+  location                           = var.location == null ? data.azurerm_resource_group.rg.location : var.location
+  storage_container_name             = "mlflow-artifacts"
   #checkov:skip=CKV_SECRET_6:This is only a secret name
   auth_client_secret = "auth-client-secret"
   identity_providers = {
