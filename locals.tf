@@ -39,5 +39,6 @@ locals {
   api_versions = {
     container_apps              = "Microsoft.App/containerApps@2022-03-01"
     container_apps_auth_configs = "Microsoft.App/containerApps/authConfigs@2022-03-01"
+    managed_environment         = "Microsoft.App/managedEnvironments@2022-03-01"
   }
 }

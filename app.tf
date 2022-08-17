@@ -20,7 +20,7 @@ resource "azapi_resource" "managed_environment" {
   name      = local.mlflow_name_from_descriptor
   location  = local.location
   parent_id = data.azurerm_resource_group.rg.id
-  type      = "Microsoft.App/managedEnvironments@2022-03-01"
+  type      = local.api_versions.managed_environment
 
   body = jsonencode({
     properties = {
