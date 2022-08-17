@@ -27,4 +27,17 @@ locals {
       }
     }
   }
+
+  log_workspace = var.log_analytics_workspace_id == null ? {
+    workspace_id       = one(azurerm_log_analytics_workspace.log_workspace[*]).workspace_id
+    primary_shared_key = one(azurerm_log_analytics_workspace.log_workspace[*]).primary_shared_key
+    } : {
+    workspace_id       = one(data.azurerm_log_analytics_workspace.log_workspace[*]).workspace_id
+    primary_shared_key = one(data.azurerm_log_analytics_workspace.log_workspace[*]).primary_shared_key
+  }
+
+  api_versions = {
+    container_apps              = "Microsoft.App/containerApps@2022-03-01"
+    container_apps_auth_configs = "Microsoft.App/containerApps/authConfigs@2022-03-01"
+  }
 }

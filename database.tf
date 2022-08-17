@@ -39,10 +39,5 @@ resource "azurerm_mssql_database" "mlflow_db" {
   min_capacity                = 0.5
   read_scale                  = false
   zone_redundant              = false
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
-  tags = module.this.context.tags
+  tags                        = module.this.context.tags
 }

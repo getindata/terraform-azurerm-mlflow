@@ -39,7 +39,7 @@ variable "storage_sku" {
 variable "mlflow_docker_image" {
   description = "MLflow docker image. See https://github.com/getindata/mlflow-docker"
   type        = string
-  default     = "marrrcin/mlflow-azure:latest"
+  default     = "gcr.io/getindata-images-public/mlflow:azure-1.28.0"
 }
 
 variable "cpu" {

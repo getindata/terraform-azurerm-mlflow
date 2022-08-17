@@ -15,15 +15,6 @@ data "azurerm_log_analytics_workspace" "log_workspace" {
   count = var.log_analytics_workspace_id != null ? 1 : 0
 }
 
-locals {
-  log_workspace = var.log_analytics_workspace_id == null ? {
-    workspace_id       = one(azurerm_log_analytics_workspace.log_workspace[*]).workspace_id
-    primary_shared_key = one(azurerm_log_analytics_workspace.log_workspace[*]).primary_shared_key
-    } : {
-    workspace_id       = one(data.azurerm_log_analytics_workspace.log_workspace[*]).workspace_id
-    primary_shared_key = one(data.azurerm_log_analytics_workspace.log_workspace[*]).primary_shared_key
-  }
-}
 
 resource "azapi_resource" "managed_environment" {
   name      = local.mlflow_name_from_descriptor
@@ -43,17 +34,10 @@ resource "azapi_resource" "managed_environment" {
     }
   })
 
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
-
   tags = module.this.context.tags
 }
 
 data "azurerm_storage_account" "storage_account" {
-  depends_on          = [module.storage_account]
   name                = module.storage_account.storage_account_name
   resource_group_name = data.azurerm_resource_group.rg.name
 }
@@ -62,7 +46,7 @@ resource "azapi_resource" "mlflow_app" {
   name                   = local.mlflow_name_from_descriptor
   location               = local.location
   parent_id              = data.azurerm_resource_group.rg.id
-  type                   = "Microsoft.App/containerApps@2022-03-01"
+  type                   = local.api_versions.container_apps
   response_export_values = ["*"]
 
   body = jsonencode({
@@ -123,12 +107,6 @@ resource "azapi_resource" "mlflow_app" {
     }
   })
 
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
-
   depends_on = [
     azapi_resource.managed_environment,
     azurerm_mssql_database.mlflow_db
@@ -138,7 +116,7 @@ resource "azapi_resource" "mlflow_app" {
 resource "azapi_resource" "mlflow_app_auth" {
   name      = "current"
   parent_id = azapi_resource.mlflow_app.id
-  type      = "Microsoft.App/containerApps/authConfigs@2022-03-01"
+  type      = local.api_versions.container_apps_auth_configs
 
   body = jsonencode({
     properties = {
