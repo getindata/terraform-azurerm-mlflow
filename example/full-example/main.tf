@@ -1,6 +1,25 @@
-module "terraform_module_template" {
-  source  = "../../"
+data "azurerm_resource_group" "this" {
+  name = "my-resource-group"
+}
+
+module "azure_mlfow" {
+  source  = "../.."
   context = module.this.context
 
-  example_var = "This is example value."
+  resource_group_name = data.azurerm_resource_group.this.name
+
+  #  auth = {
+  #    type = "google"
+  #    client_secret = ""
+  #    client_id = ""
+  #  }
+
+  auth = {
+    type          = "azureActiveDirectory"
+    client_secret = ""
+    client_id     = ""
+    azureActiveDirectory = {
+      tenant_id = ""
+    }
+  }
 }

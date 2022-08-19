@@ -1,13 +1,12 @@
-# Example resource that outputs the input value and 
-# echoes it's base64 encoded version locally 
+# TODO:
+# https://techcommunity.microsoft.com/t5/fasttrack-for-azure/can-i-create-an-azure-container-apps-in-terraform-yes-you-can/ba-p/3570694
 
-resource "null_resource" "output_input" {
+data "azurerm_resource_group" "rg" {
+  name = var.resource_group_name
+}
 
-  triggers = {
-    input = var.example_var
-  }
-
-  provisioner "local-exec" {
-    command = "echo ${var.example_var} | base64"
-  }
+terraform {
+  # Optional attributes and the defaults function are
+  # both experimental, so we must opt in to the experiment.
+  experiments = [module_variable_optional_attrs]
 }
