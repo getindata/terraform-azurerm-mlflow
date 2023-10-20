@@ -1,6 +1,6 @@
 module "storage_account" {
   source                = "getindata/storage-account/azurerm"
-  version               = "1.1.0"
+  version               = "1.7.1"
   context               = module.this.context
   create_resource_group = false
   location              = local.location
